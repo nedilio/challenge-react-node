@@ -1,21 +1,43 @@
-import database from "./model.js";
+import { pool } from "./pool.js";
 
-export const getAllPosts = () => {
-  const getPostsQuery = database.prepare("SELECT * FROM posts");
-  const posts = getPostsQuery.all();
-  return posts;
-};
-
-export const createPost = (title, content) => {
-  const addPostQuery = database.prepare(
-    "INSERT INTO posts (nombre, descripcion) VALUES (?, ?)",
+export const getAllPosts = async () => {
+  const result = await pool.query(
+    "SELECT * FROM posts ORDER BY created_at ASC",
   );
-  const res = addPostQuery.run(title, content);
-  return res;
+
+  if (result.rowCount === 0) {
+    throw new Error("No posts found");
+  }
+
+  return result.rows;
 };
 
-export const deletePostById = (id) => {
-  const deletePostQuery = database.prepare("DELETE FROM posts WHERE id = ?");
-  const res = deletePostQuery.run(id);
-  return res;
+export const createPost = async (nombre, descripcion) => {
+  const result = await pool.query(
+    `INSERT INTO posts (nombre, descripcion) 
+    VALUES ($1, $2)
+    RETURNING *`,
+    [nombre, descripcion],
+  );
+  if (result.rowCount === 0) {
+    throw new Error("Failed to create post");
+  }
+  return result.rows[0];
+};
+
+export const deletePostById = async (id) => {
+  const result = await pool.query(
+    `DELETE FROM posts
+   WHERE id = $1
+   RETURNING *`,
+    [id],
+  );
+
+  if (result.rowCount === 0) {
+    throw new Error("Post not found");
+  }
+
+  console.log(result.rows[0]);
+
+  return result.rows[0];
 };

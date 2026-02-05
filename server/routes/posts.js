@@ -11,41 +11,37 @@ const loggerMiddleware = (req, res, next) => {
 
 postsRouter.use(loggerMiddleware);
 
-postsRouter.get("/", (req, res) => {
+postsRouter.get("/", async (_, res) => {
   try {
-    const posts = getAllPosts();
+    const posts = await getAllPosts();
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-postsRouter.post("/", (req, res) => {
+postsRouter.post("/", async (req, res) => {
   const { nombre, descripcion } = req.body;
   try {
-    const result = createPost(nombre, descripcion);
+    const result = await createPost(nombre, descripcion);
 
-    if (result.changes === 0) {
+    if (!result) {
       return res.status(500).json({ error: "Failed to create post" });
     }
 
-    res.status(201).json({
-      message: "Post created",
-      post: { nombre, descripcion, id: result.lastInsertRowid },
-    });
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-postsRouter.delete("/:id", (req, res) => {
+postsRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
+  console.log({ id });
   try {
-    const result = deletePostById(id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-    res.status(200).json({ message: `Post with id ${id} deleted` });
+    const result = await deletePostById(id);
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

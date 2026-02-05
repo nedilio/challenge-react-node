@@ -10,12 +10,15 @@ import { Input } from "@/components/ui/input";
 import { createPost } from "@/lib/data";
 import { useState } from "react";
 import type { Post } from "@/types/types";
+import { useDispatch } from "react-redux";
+import { create } from "@/state/posts/postsSlice";
 
 function Form() {
   const [newPost, setNewPost] = useState<Omit<Post, "id">>({
     nombre: "",
     descripcion: "",
   });
+  const dispatch = useDispatch();
   const [error, setError] = useState<string | null>(null);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,9 +32,15 @@ function Form() {
       return;
     }
 
-    await createPost({ nombre, descripcion });
-    setNewPost({ nombre: "", descripcion: "" });
-    setError(null);
+    try {
+      await createPost({ nombre, descripcion });
+      dispatch(create({ nombre, descripcion }));
+      setNewPost({ nombre: "", descripcion: "" });
+      setError(null);
+    } catch (error) {
+      setError("Error al crear el post. Inténtalo de nuevo.");
+      console.error("Error creating post:", error);
+    }
   };
   return (
     <form onSubmit={handleSubmit}>

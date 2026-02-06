@@ -10,8 +10,8 @@ import {
 import type { Post } from "@/types/types";
 import { useDispatch } from "react-redux";
 import { deletePostAsync } from "@/state/posts/postsSlice";
-import { Skeleton } from "./ui/skeleton";
-import { Card, CardContent } from "./ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import type { AppDispatch } from "@/state/store";
 
 const PostsTable = ({

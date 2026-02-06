@@ -3,11 +3,13 @@ import "./App.css";
 
 import Form from "@/components/Form";
 import PostsTable from "@/components/PostsTable";
-import { Input } from "./components/ui/input";
-import { Label } from "./components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "./state/store";
-import { fetchPostsAsync } from "./state/posts/postsSlice";
+import type { AppDispatch, RootState } from "@/state/store";
+import { fetchPostsAsync } from "@/state/posts/postsSlice";
+import { Toaster } from "@/components/ui/sonner";
+import { Card, CardContent, CardHeader } from "./components/ui/card";
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,16 +33,24 @@ function App() {
   }, [dispatch]);
 
   return (
-    <main className="flex flex-col justify-center gap-4 items-center min-h-screen">
-      <div className="container">
-        <div>
-          <Label> Nombre </Label>
-          <Input onChange={handleFilter}></Input>
+    <>
+      <main className="flex flex-col justify-center gap-4 items-center min-h-screen px-4 py-8">
+        <div className="container flex flex-col justify-center gap-4 items-center">
+          <Card>
+            <CardHeader>Filtrar Posts por nombre</CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-2">
+                <Label> Nombre </Label>
+                <Input onChange={handleFilter}></Input>
+              </div>
+            </CardContent>
+          </Card>
+          <PostsTable posts={filteredPosts} loading={loading} />
+          <Form />
         </div>
-        <PostsTable posts={filteredPosts} loading={loading} />
-        <Form />
-      </div>
-    </main>
+      </main>
+      <Toaster />
+    </>
   );
 }
 

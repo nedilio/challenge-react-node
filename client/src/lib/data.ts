@@ -1,4 +1,5 @@
 import type { Post } from "@/types/types";
+import { toast } from "sonner";
 const API_URL = "http://localhost:3000/api/posts";
 
 export const getAllPosts = async (): Promise<Post[]> => {
@@ -39,6 +40,16 @@ export const createPost = async (post: Omit<Post, "id">): Promise<Post> => {
       body: JSON.stringify(post),
     });
     if (!response.ok) {
+      if (response.status === 400) {
+        const errorData = await response.json();
+        errorData.details.forEach((detail: { message: string }) => {
+          console.error("Validation error:", detail.message);
+          toast.error(detail.message, {
+            richColors: true,
+          });
+        });
+        throw new Error(errorData.error || "Validation error");
+      }
       throw new Error("Failed to create post");
     }
     const data = await response.json();
